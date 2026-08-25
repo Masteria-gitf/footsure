@@ -2,91 +2,119 @@
   "updated": "2026-08-25",
   "predictions": [
     {
-      "competition": "Premier League / Championship",
-      "home": "Équipe A",
-      "away": "Adversaire 1",
-      "kickoff": "15:00",
-      "prediction": "1X ou Victoire domicile",
-      "confidence": "Moyenne-Élevée",
-      "score": "1-0 / 2-1",
-      "factors": [
-        "Forme domicile solide",
-        "Adversaire en difficulté à l'extérieur",
-        "Motivation élevée"
-      ],
-      "risks": [
-        "Rotation d'effectif",
-        "Carton rouge",
-        "But sur set-piece",
-        "Arbitrage strict"
-      ],
-      "ultimate": true
-    },
-    {
-      "competition": "La Liga / Serie A",
-      "home": "Équipe B",
-      "away": "Adversaire 2",
-      "kickoff": "17:30",
-      "prediction": "Double chance 1X",
+      "competition": "Premier League",
+      "home": "Aston Villa FC",
+      "away": "Newcastle United FC",
+      "kickoff": "12:30",
+      "prediction": "1X (Double Chance)",
       "confidence": "Élevée",
       "score": "1-1 / 1-0",
       "factors": [
         "Solide à domicile",
-        "Adversaire irrégulier",
-        "Historique favorable"
+        "Adversaire irrégulier à l'extérieur",
+        "Historique récent favorable"
       ],
       "risks": [
-        "Fatigue calendrier",
-        "Changement tactique",
+        "Carton rouge précoce",
         "But sur corner",
+        "Changement tactique de dernière minute",
+        "Fatigue calendrier"
+      ],
+      "ultimate": true
+    },
+    {
+      "competition": "Premier League",
+      "home": "Chelsea FC",
+      "away": "Crystal Palace FC",
+      "kickoff": "14:00",
+      "prediction": "Victoire domicile",
+      "confidence": "Moyenne-Élevée",
+      "score": "2-1 / 2-0",
+      "factors": [
+        "Avantage domicile",
+        "Meilleure forme récente",
+        "Motivation forte"
+      ],
+      "risks": [
+        "Rotation d'effectif",
+        "But rapide adverse",
+        "Arbitrage strict",
         "Pression"
       ],
       "ultimate": false
     },
     {
-      "competition": "Bundesliga / Ligue 1",
-      "home": "Équipe C",
-      "away": "Adversaire 3",
-      "kickoff": "20:00",
+      "competition": "Premier League",
+      "home": "Leeds United FC",
+      "away": "Newcastle United FC",
+      "kickoff": "17:30",
       "prediction": "Plus de 2.5 buts",
       "confidence": "Moyenne",
       "score": "2-1 / 2-2",
       "factors": [
         "Deux équipes offensives",
         "Défenses fragiles récemment",
-        "Match ouvert"
+        "Match ouvert attendu"
       ],
       "risks": [
-        "Rotation",
-        "But annulé",
+        "Rotation (cup)",
+        "But annulé hors-jeu",
         "Match fermé si but tôt",
-        "Carton"
+        "Carton rouge"
       ],
       "ultimate": false
     },
     {
-      "competition": "Champions League / Europa",
-      "home": "Équipe D",
-      "away": "Adversaire 4",
-      "kickoff": "20:45",
-      "prediction": "Victoire domicile",
-      "confidence": "Moyenne-Élevée",
-      "score": "2-0 / 2-1",
+      "competition": "Premier League",
+      "home": "Crystal Palace FC",
+      "away": "Sunderland AFC",
+      "kickoff": "15:00",
+      "prediction": "Double chance X2",
+      "confidence": "Moyenne",
+      "score": "1-1 / 0-1",
       "factors": [
-        "Avantage domicile",
-        "Expérience européenne",
-        "Motivation qualification"
+        "Équipe extérieure en forme",
+        "Locaux en difficulté",
+        "Historique équilibré"
       ],
       "risks": [
         "Météo",
-        "But rapide adverse",
-        "Arbitrage",
+        "But sur set-piece",
+        "Changement de système",
         "Pression psychologique"
+      ],
+      "ultimate": false
+    },
+    {
+      "competition": "Premier League",
+      "home": "Everton FC",
+      "away": "Aston Villa FC",
+      "kickoff": "15:00",
+      "prediction": "1X (Double Chance)",
+      "confidence": "Élevée",
+      "score": "1-1 / 1-0",
+      "factors": [
+        "Solide à domicile",
+        "Adversaire irrégulier à l'extérieur",
+        "Historique récent favorable"
+      ],
+      "risks": [
+        "Carton rouge précoce",
+        "But sur corner",
+        "Changement tactique de dernière minute",
+        "Fatigue calendrier"
       ],
       "ultimate": false
     }
   ],
   "history": [
+    {
+      "date": "2026-08-25",
+      "match": "Mise à jour automatique",
+      "pred": "Système",
+      "result": "-",
+      "status": "OK"
+    },
     {
       "date": "2026-08-25",
       "match": "Mise à jour automatique",
