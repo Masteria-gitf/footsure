@@ -1,0 +1,75 @@
+{
+  "updated": "2026-08-25",
+  "predictions": [
+    {
+      "competition": "La Liga",
+      "home": "Valencia",
+      "away": "Real Betis",
+      "kickoff": "20:00",
+      "prediction": "1X (Double Chance)",
+      "confidence": "Élevée",
+      "score": "1-1 / 1-0",
+      "factors": [
+        "Valencia solide à domicile cette saison",
+        "Betis irrégulier à l'extérieur",
+        "Historique récent favorable aux locaux"
+      ],
+      "risks": [
+        "Carton rouge précoce (intensité élevée)",
+        "But sur corner / set-piece (Betis dangereux)",
+        "Changement tactique de dernière minute",
+        "Fatigue liée au calendrier"
+      ],
+      "ultimate": true
+    },
+    {
+      "competition": "Champions League Qual.",
+      "home": "Bodø/Glimt",
+      "away": "NEC Nijmegen",
+      "kickoff": "20:00",
+      "prediction": "Victoire domicile",
+      "confidence": "Moyenne",
+      "score": "2-1",
+      "factors": [
+        "Bodø ultra-dominateur à domicile",
+        "Avance dans le match aller",
+        "NEC peu expérimenté à ce niveau"
+      ],
+      "risks": [
+        "Conditions météo extrêmes en Norvège",
+        "But rapide de NEC qui change tout",
+        "Arbitrage strict (cartons)",
+        "Pression psychologique sur les locaux"
+      ],
+      "ultimate": false
+    },
+    {
+      "competition": "League Cup",
+      "home": "Nottingham Forest",
+      "away": "Leeds United",
+      "kickoff": "20:00",
+      "prediction": "Plus de 2.5 buts",
+      "confidence": "Moyenne-Élevée",
+      "score": "2-1 / 2-2",
+      "factors": [
+        "Deux équipes offensives",
+        "Leeds en transition, défense fragile",
+        "Forest cherche à s'imposer"
+      ],
+      "risks": [
+        "Rotation importante (cup)",
+        "But annulé pour hors-jeu serré",
+        "Match fermé si score tôt",
+        "Carton rouge qui déséquilibre"
+      ],
+      "ultimate": false
+    }
+  ],
+  "history": [
+    {"date": "2026-08-24", "match": "Fulham – Chelsea", "pred": "Chelsea ou Nul", "result": "2-3", "status": "Gagné"},
+    {"date": "2026-08-24", "match": "Roma – Fiorentina", "pred": "Victoire Roma", "result": "4-0", "status": "Gagné"},
+    {"date": "2026-08-24", "match": "Osasuna – Levante", "pred": "Moins de 2.5", "result": "0-0", "status": "Gagné"},
+    {"date": "2026-08-23", "match": "Newcastle – Liverpool", "pred": "Liverpool", "result": "1-2", "status": "Gagné"},
+    {"date": "2026-08-23", "match": "Man City – Bournemouth", "pred": "City -1.5", "result": "3-0", "status": "Gagné"}
+  ]
+}
