@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Footsure – Prédictions Automatiques</title>
+  <meta name="theme-color" content="#0b1120" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{background:#0b1120;font-family:system-ui,-apple-system,sans-serif}
+    .card{transition:transform .2s}.card:active{transform:scale(.98)}
+    .pulse{animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen">
+  <header class="bg-slate-900/95 border-b border-slate-800 sticky top-0 z-50 backdrop-blur">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center font-black text-slate-900 text-sm">F</div>
+        <div>
+          <h1 class="text-base font-bold leading-none">Footsure</h1>
+          <p class="text-[10px] text-slate-400">Auto • Transparent</p>
+        </div>
+      </div>
+      <a href="https://wa.me/2290150827349?text=Bonjour%20Footsure%2C%20je%20veux%20passer%20en%20VIP%20Pro" class="bg-green-500 text-slate-900 font-bold px-3.5 py-1.5 rounded-full text-xs">VIP Pro</a>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 pb-16">
+    <div class="mt-5 mb-4 flex items-center justify-between text-xs text-slate-400">
+      <div class="flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-500 pulse"></span>
+        <span id="status">Chargement automatique...</span>
+      </div>
+      <span id="updated"></span>
+    </div>
+
+    <section>
+      <h2 class="text-base font-bold mb-3 flex items-center gap-2"><span class="w-1 h-4 bg-green-500 rounded-full"></span>Prédictions du jour</h2>
+      <div id="list" class="space-y-3"><div class="text-center text-slate-500 py-10 text-sm">Chargement...</div></div>
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-base font-bold mb-3 flex items-center gap-2"><span class="w-1 h-4 bg-green-500 rounded-full"></span>Historique</h2>
+      <div id="history" class="space-y-2 text-sm"></div>
+    </section>
+
+    <section class="mt-12">
+      <div class="bg-gradient-to-br from-green-950/40 to-slate-900 rounded-2xl p-5 border border-green-900/40 text-center">
+        <h3 class="font-bold text-lg mb-1">VIP Pro</h3>
+        <p class="text-slate-400 text-xs mb-4">Analyses prioritaires + alertes WhatsApp</p>
+        <a href="https://wa.me/2290150827349?text=Bonjour%20Footsure%2C%20je%20veux%20passer%20en%20VIP%20Pro" class="inline-block bg-green-500 text-slate-900 font-bold px-5 py-2.5 rounded-full text-sm">Contacter WhatsApp</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-[10px] text-slate-600 py-6 border-t border-slate-900">
+    Footsure • Raisonnement transparent • Scénarios imprévus inclus<br>Aucune promesse de gain
+  </footer>
+
+  <script>
+    // Charge data/predictions.json (mis à jour automatiquement par GitHub Actions)
+    // Fallback intégré si le fichier n'existe pas encore
+    const FALLBACK = {
+      updated: new Date().toISOString().slice(0,10),
+      predictions: [
+        {
+          competition: "La Liga",
+          home: "Valencia",
+          away: "Real Betis",
+          kickoff: "20:00",
+          prediction: "1X (Double Chance)",
+          confidence: "Élevée",
+          score: "1-1 / 1-0",
+          factors: ["Valencia solide à domicile","Betis irrégulier à l'extérieur","Historique récent favorable"],
+          risks: ["Carton rouge précoce","But sur corner","Changement tactique dernière minute","Fatigue calendrier"],
+          ultimate: true
+        },
+        {
+          competition: "Champions League Qual.",
+          home: "Bodø/Glimt",
+          away: "NEC Nijmegen",
+          kickoff: "20:00",
+          prediction: "Victoire domicile",
+          confidence: "Moyenne",
+          score: "2-1",
+          factors: ["Bodø dominant à domicile","Avance match aller","NEC peu expérimenté"],
+          risks: ["Météo extrême","But rapide adverse","Arbitrage strict","Pression psychologique"],
+          ultimate: false
+        },
+        {
+          competition: "League Cup",
+          home: "Nottingham Forest",
+          away: "Leeds United",
+          kickoff: "20:00",
+          prediction: "Plus de 2.5 buts",
+          confidence: "Moyenne-Élevée",
+          score: "2-1 / 2-2",
+          factors: ["Deux équipes offensives","Défense Leeds fragile","Forest veut s'imposer"],
+          risks: ["Rotation cup","But annulé hors-jeu","Match fermé si but tôt","Carton rouge"],
+          ultimate: false
+        }
+      ],
+      history: [
+        {date:"2026-08-24",match:"Fulham – Chelsea",pred:"Chelsea ou Nul",result:"2-3",status:"Gagné"},
+        {date:"2026-08-24",match:"Roma – Fiorentina",pred:"Victoire Roma",result:"4-0",status:"Gagné"},
+        {date:"2026-08-24",match:"Osasuna – Levante",pred:"Moins de 2.5",result:"0-0",status:"Gagné"},
+        {date:"2026-08-23",match:"Newcastle – Liverpool",pred:"Liverpool",result:"1-2",status:"Gagné"},
+        {date:"2026-08-23",match:"Man City – Bournemouth",pred:"City -1.5",result:"3-0",status:"Gagné"}
+      ]
+    };
+
+    function render(data) {
+      document.getElementById("status").textContent = "Données à jour";
+      document.getElementById("updated").textContent = "MAJ " + (data.updated || "");
+      document.getElementById("list").innerHTML = (data.predictions||[]).map(p => `
+        <article class="card bg-slate-900 border border-slate-700/70 rounded-xl overflow-hidden">
+          <div class="p-4">
+            <div class="flex items-center justify-between gap-2 mb-2.5">
+              <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">${p.competition||""}</span>
+              ${p.ultimate ? '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-green-500 text-slate-900">ULTIME</span>' : ''}
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="font-bold text-sm text-center flex-1">${p.home||""}</div>
+              <div class="text-slate-500 text-xs px-2">vs</div>
+              <div class="font-bold text-sm text-center flex-1">${p.away||""}</div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mb-3 text-center">
+              <div class="bg-slate-800/60 rounded-lg p-2">
+                <div class="text-[9px] text-slate-400">Prono</div>
+                <div class="font-bold text-green-400 text-xs leading-tight">${p.prediction||"-"}</div>
+              </div>
+              <div class="bg-slate-800/60 rounded-lg p-2">
+                <div class="text-[9px] text-slate-400">Confiance</div>
+                <div class="font-bold text-xs ${ (p.confidence||'').includes('Élevée') ? 'text-green-400' : 'text-yellow-400'}">${p.confidence||"-"}</div>
+              </div>
+              <div class="bg-slate-800/60 rounded-lg p-2">
+                <div class="text-[9px] text-slate-400">Score</div>
+                <div class="font-bold text-xs">${p.score||"-"}</div>
+              </div>
+            </div>
+            <div class="grid gap-2 text-xs">
+              <div>
+                <div class="text-[9px] font-semibold text-slate-500 uppercase mb-1">Facteurs</div>
+                <ul class="space-y-0.5 text-slate-200">${(p.factors||[]).map(f=>`<li class="flex gap-1"><span class="text-green-400">✓</span>${f}</li>`).join("")}</ul>
+              </div>
+              <div>
+                <div class="text-[9px] font-semibold text-slate-500 uppercase mb-1">Scénarios imprévus</div>
+                <ul class="space-y-0.5 text-slate-300">${(p.risks||[]).map(r=>`<li class="flex gap-1"><span class="text-yellow-500">⚠</span>${r}</li>`).join("")}</ul>
+              </div>
+            </div>
+          </div>
+        </article>`).join("") || '<p class="text-slate-500 text-center py-6 text-sm">Aucune prédiction</p>';
+
+      document.getElementById("history").innerHTML = (data.history||[]).map(h => `
+        <div class="flex items-center justify-between gap-2 bg-slate-900/80 border border-slate-800 rounded-lg px-3 py-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-slate-500 text-[10px] w-14 shrink-0">${(h.date||"").slice(5)}</span>
+            <span class="font-medium text-xs truncate">${h.match||""}</span>
+          </div>
+          <div class="flex items-center gap-2 text-[11px] shrink-0">
+            <span class="font-medium">${h.result||""}</span>
+            <span class="${h.status==='Gagné'?'text-green-400':'text-red-400'} font-semibold">${h.status||""}</span>
+          </div>
+        </div>`).join("");
+    }
+
+    async function load() {
+      try {
+        const res = await fetch("./data/predictions.json?t=" + Date.now());
+        if (res.ok) {
+          render(await res.json());
+          return;
+        }
+      } catch(e) {}
+      render(FALLBACK);
+    }
+    load();
+  </script>
+</body>
+</html>
