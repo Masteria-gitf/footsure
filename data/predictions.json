@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-30",
+  "updated": "2026-08-31",
   "predictions": [
     {
       "competition": "Premier League",
@@ -109,6 +109,13 @@
   ],
   "history": [
     {
+      "date": "2026-08-31",
+      "match": "Mise à jour automatique",
+      "pred": "Système",
+      "result": "-",
+      "status": "OK"
+    },
+    {
       "date": "2026-08-30",
       "match": "Mise à jour automatique",
       "pred": "Système",
@@ -176,13 +183,6 @@
       "match": "Newcastle – Liverpool",
       "pred": "Liverpool",
       "result": "1-2",
-      "status": "Gagné"
-    },
-    {
-      "date": "2026-08-23",
-      "match": "Man City – Bournemouth",
-      "pred": "City -1.5",
-      "result": "3-0",
       "status": "Gagné"
     }
   ]
