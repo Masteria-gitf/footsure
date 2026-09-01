@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-31",
+  "updated": "2026-09-01",
   "predictions": [
     {
       "competition": "Premier League",
@@ -109,6 +109,13 @@
   ],
   "history": [
     {
+      "date": "2026-09-01",
+      "match": "Mise à jour automatique",
+      "pred": "Système",
+      "result": "-",
+      "status": "OK"
+    },
+    {
       "date": "2026-08-31",
       "match": "Mise à jour automatique",
       "pred": "Système",
@@ -176,13 +183,6 @@
       "match": "Osasuna – Levante",
       "pred": "Moins de 2.5",
       "result": "0-0",
-      "status": "Gagné"
-    },
-    {
-      "date": "2026-08-23",
-      "match": "Newcastle – Liverpool",
-      "pred": "Liverpool",
-      "result": "1-2",
       "status": "Gagné"
     }
   ]
