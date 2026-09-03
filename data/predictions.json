@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-02",
+  "updated": "2026-09-03",
   "predictions": [
     {
       "competition": "Premier League",
@@ -109,6 +109,13 @@
   ],
   "history": [
     {
+      "date": "2026-09-03",
+      "match": "Mise à jour automatique",
+      "pred": "Système",
+      "result": "-",
+      "status": "OK"
+    },
+    {
       "date": "2026-09-02",
       "match": "Mise à jour automatique",
       "pred": "Système",
@@ -176,13 +183,6 @@
       "match": "Fulham – Chelsea",
       "pred": "Chelsea ou Nul",
       "result": "2-3",
-      "status": "Gagné"
-    },
-    {
-      "date": "2026-08-24",
-      "match": "Roma – Fiorentina",
-      "pred": "Victoire Roma",
-      "result": "4-0",
       "status": "Gagné"
     }
   ]
