@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-07",
+  "updated": "2026-09-08",
   "predictions": [
     {
       "competition": "Premier League",
@@ -109,6 +109,13 @@
   ],
   "history": [
     {
+      "date": "2026-09-08",
+      "match": "Mise à jour automatique",
+      "pred": "Système",
+      "result": "-",
+      "status": "OK"
+    },
+    {
       "date": "2026-09-07",
       "match": "Mise à jour automatique",
       "pred": "Système",
@@ -173,13 +180,6 @@
     },
     {
       "date": "2026-08-29",
-      "match": "Mise à jour automatique",
-      "pred": "Système",
-      "result": "-",
-      "status": "OK"
-    },
-    {
-      "date": "2026-08-28",
       "match": "Mise à jour automatique",
       "pred": "Système",
       "result": "-",
