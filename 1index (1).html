@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d2025">
+<title>PhotoPro — Tes photos au rendu professionnel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+<style>
+:root{
+  --bg:#1d2025; --panel:#272b32; --panel2:#2f343c; --line:#3a404a;
+  --txt:#f2f3f5; --mut:#a2a9b5; --acc:#ffc933; --acc-ink:#2a2100;
+  --ok:#3ccf8e; --err:#ff6b5e; --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{background:var(--bg)}
+body{
+  font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--txt);line-height:1.5;
+  padding:max(16px,env(safe-area-inset-top)) 16px max(32px,env(safe-area-inset-bottom));
+  max-width:780px;margin:0 auto;
+}
+h1{font-size:clamp(1.7rem,6vw,2.3rem);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin:12px 0 8px}
+.sub{color:var(--mut);font-size:.98rem;max-width:48ch}
+section{margin-top:24px}
+h2{font-size:1rem;font-weight:700;margin-bottom:10px}
+
+.drop{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+  min-height:140px;padding:20px;border:2px dashed var(--line);border-radius:var(--r);
+  background:var(--panel);cursor:pointer;transition:border-color .15s,background .15s;
+}
+.drop:hover,.drop.over{border-color:var(--acc);background:var(--panel2)}
+.drop strong{font-size:1.08rem}
+.drop span{color:var(--mut);font-size:.9rem}
+.drop:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+
+.styles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.style{
+  text-align:left;background:var(--panel);border:2px solid var(--line);border-radius:var(--r);
+  padding:10px;color:var(--txt);font:inherit;cursor:pointer;transition:border-color .15s,background .15s;
+}
+.style b{display:block;font-size:1rem;margin:10px 4px 2px}
+.style small{color:var(--mut);font-size:.82rem;line-height:1.35;display:block;margin:0 4px 4px}
+.style[aria-pressed="true"]{border-color:var(--acc);background:var(--panel2)}
+.pv{position:relative;aspect-ratio:4/3;background:#14161a;border-radius:10px;overflow:hidden}
+.pv canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pv .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:var(--mut);font-size:.78rem}
+.styles.mini .style{padding:12px}
+.styles.mini .style b{margin:0 0 2px}
+.styles.mini .style small{margin:0}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:.85rem;font-weight:700;border:2px solid var(--line);background:var(--panel);color:var(--txt);border-radius:99px;padding:8px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--acc);background:var(--acc);color:var(--acc-ink)}
+
+.opts{display:grid;gap:14px;background:var(--panel);border-radius:var(--r);padding:16px}
+.row{display:grid;gap:6px}
+.row label{font-size:.88rem;color:var(--mut);display:flex;justify-content:space-between;gap:8px}
+.row label output{color:var(--txt);font-weight:700}
+.row .hint{font-size:.76rem;color:var(--mut)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font:inherit}
+input[type=range]{width:100%;accent-color:var(--acc);height:28px}
+
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:14px 18px;cursor:pointer;background:var(--panel2);color:var(--txt);transition:transform .1s,opacity .15s}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.main{background:var(--acc);color:var(--acc-ink);font-size:1.05rem;width:100%;padding:16px}
+.btn.sm{padding:9px 14px;font-size:.9rem}
+.btn.acc{background:var(--acc);color:var(--acc-ink)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.actions .full{grid-column:1/-1}
+
+.prog{margin-top:12px;display:none}
+.prog.on{display:block}
+.track{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden}
+.bar{height:100%;width:0;background:var(--acc);transition:width .25s}
+.prog p{font-size:.85rem;color:var(--mut);margin-top:6px}
+
+.head{display:flex;justify-content:space-between;align-items:baseline}
+.head span{color:var(--mut);font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:10px}
+.item{background:var(--panel);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.thumb{position:relative;aspect-ratio:4/3;background:#14161a}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.b{position:absolute;top:8px;left:8px;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(20,22,26,.85);color:var(--txt)}
+.b.ok{background:var(--ok);color:#06281a}
+.b.wk{background:var(--acc);color:var(--acc-ink)}
+.b.er{background:var(--err);color:#2c0803}
+.meta{padding:8px 10px 4px;font-size:.78rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tools{display:flex;flex-wrap:wrap;gap:6px;padding:6px 10px 10px}
+.tools button,.tools a{font:inherit;font-size:.78rem;font-weight:700;text-decoration:none;text-align:center;background:var(--panel2);color:var(--txt);border:0;border-radius:8px;padding:7px 10px;cursor:pointer}
+.tools a.dl{background:var(--acc);color:var(--acc-ink)}
+.tools button[disabled]{opacity:.4}
+.empty{color:var(--mut);font-size:.92rem;padding:18px 4px}
+
+.modal{position:fixed;inset:0;background:rgba(10,11,14,.94);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));z-index:20}
+.modal.on{display:flex}
+.cmp{position:relative;overflow:hidden;border-radius:12px;background:#000;max-width:100%}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-drag:none}
+#cmpTop{clip-path:inset(0 50% 0 0)}
+.cmp .tag{position:absolute;bottom:10px;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:99px;background:rgba(20,22,26,.85)}
+.cmp .t1{left:10px}.cmp .t2{right:10px}
+.cmp .line{position:absolute;top:0;bottom:0;width:2px;background:var(--acc);left:50%;pointer-events:none}
+.modal input[type=range]{max-width:520px}
+
+/* éditeur */
+.editor{position:fixed;inset:0;background:var(--bg);z-index:25;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.editor.on{display:block}
+.ed-top{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg);padding:max(10px,env(safe-area-inset-top)) 14px 10px;border-bottom:1px solid var(--line)}
+.ed-top strong{font-size:.95rem}
+.ed-prev{position:sticky;top:calc(56px + env(safe-area-inset-top));z-index:2;background:#111316;padding:10px 14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.ed-prev canvas{max-width:100%;max-height:40vh;border-radius:8px;display:block;background:#000}
+.hold{font:inherit;font-size:.8rem;font-weight:700;background:var(--panel2);color:var(--txt);border:0;border-radius:99px;padding:8px 14px;user-select:none;-webkit-user-select:none;touch-action:none}
+.ed-body{max-width:780px;margin:0 auto;padding:16px 14px max(32px,env(safe-area-inset-bottom));display:grid;gap:16px}
+.ed-body h3{font-size:.9rem;margin-bottom:8px}
+
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%) translateY(30px);background:var(--txt);color:#15171b;padding:11px 16px;border-radius:12px;font-size:.9rem;font-weight:700;opacity:0;pointer-events:none;transition:all .25s;z-index:40;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.note{margin-top:26px;color:var(--mut);font-size:.8rem;max-width:62ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Des photos qui ont l’air faites par un pro.</h1>
+  <p class="sub">Dépose jusqu’à 20 photos. Chacune est analysée, retravaillée selon son contenu, puis exportée en HD.</p>
+</header>
+
+<section>
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choisir des photos">
+    <strong>Touche ici pour choisir tes photos</strong>
+    <span>20 photos maximum · JPG, PNG, WebP</span>
+  </div>
+  <input type="file" id="file" accept="image/*" multiple hidden>
+</section>
+
+<section>
+  <h2>Rendu souhaité</h2>
+  <div class="styles">
+    <button class="style" data-style="iphone" aria-pressed="true">
+      <div class="pv"><canvas id="pv-iphone" hidden></canvas><span class="ph" id="ph-iphone">Ajoute une photo pour voir l’aperçu</span></div>
+      <b>iPhone 16 Pro Max</b>
+      <small>Lumineux, net, ombres ouvertes, couleurs éclatantes.</small>
+    </button>
+    <button class="style" data-style="pro" aria-pressed="false">
+      <div class="pv"><canvas id="pv-pro" hidden></canvas><span class="ph" id="ph-pro">Ajoute une photo pour voir l’aperçu</span></div>
+      <b>Appareil photo pro</b>
+      <small>Contraste riche, noirs profonds, lumières douces.</small>
+    </button>
+  </div>
+  <div class="chips" id="looks" style="margin-top:12px" role="group" aria-label="Ambiance"></div>
+</section>
+
+<section>
+  <div class="opts">
+    <div class="row">
+      <label for="scene">Type de photo</label>
+      <select id="scene"></select>
+      <span class="hint">« Auto » reconnaît portrait, produit, paysage, nourriture ou faible lumière.</span>
+    </div>
+    <div class="row">
+      <label for="int">Intensité <output id="intOut">100 %</output></label>
+      <input type="range" id="int" min="0" max="150" step="5" value="100">
+    </div>
+    <div class="row">
+      <label for="bokeh">Flou d’arrière-plan <output id="bokehOut">0 %</output></label>
+      <input type="range" id="bokeh" min="0" max="100" step="5" value="0">
+      <span class="hint">Effet portrait. Fonctionne mieux avec un sujet net et centré.</span>
+    </div>
+    <div class="two">
+      <div class="row">
+        <label for="res">Résolution</label>
+        <select id="res">
+          <option value="hd" selected>HD (2560 à 3200 px)</option>
+          <option value="4k">Ultra HD (4096 px)</option>
+          <option value="orig">Taille d’origine</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="fmt">Format</label>
+        <select id="fmt">
+          <option value="jpg" selected>JPG qualité max</option>
+          <option value="png">PNG sans perte</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <label for="crop">Cadrage</label>
+      <select id="crop">
+        <option value="orig" selected>Original</option>
+        <option value="1:1">Carré 1:1 (Instagram, catalogue)</option>
+        <option value="4:5">Portrait 4:5</option>
+        <option value="9:16">Story 9:16 (WhatsApp, TikTok)</option>
+        <option value="16:9">Paysage 16:9</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-top:12px">
+    <button class="btn main" id="go">Améliorer mes photos</button>
+  </div>
+  <div class="prog" id="prog">
+    <div class="track"><div class="bar" id="bar"></div></div>
+    <p id="progTxt"></p>
+    <button class="btn sm" id="cancel" hidden style="margin-top:8px">Annuler</button>
+  </div>
+</section>
+
+<section>
+  <div class="head"><h2>Mes photos</h2><span id="count">0/20</span></div>
+  <div class="actions">
+    <button class="btn" id="zip" disabled>Tout télécharger (ZIP)</button>
+    <button class="btn" id="share" disabled>Enregistrer dans la galerie</button>
+    <button class="btn full" id="clear" disabled>Tout effacer</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty">Aucune photo pour l’instant.</p>
+</section>
+
+<p class="note">Tout le traitement se fait sur ton téléphone : tes photos ne sont envoyées nulle part. Le résultat dépend de la photo de départ — une image nette et bien cadrée donne le meilleur rendu. Touche « Retoucher » sur une photo pour régler lumière, couleurs et détails à la main.</p>
+
+<!-- comparaison -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Comparer avant et après">
+  <div class="cmp" id="cmp">
+    <img id="cmpBot" alt="Après">
+    <img id="cmpTop" alt="Avant">
+    <div class="line" id="cmpLine"></div>
+    <span class="tag t1">Avant</span><span class="tag t2">Après</span>
+  </div>
+  <input type="range" id="cmpRange" min="0" max="100" value="50" aria-label="Curseur avant / après">
+  <button class="btn" id="cmpClose">Fermer</button>
+</div>
+
+<!-- éditeur -->
+<div class="editor" id="editor" role="dialog" aria-modal="true" aria-label="Retoucher la photo">
+  <div class="ed-top">
+    <button class="btn sm" id="edCancel">Annuler</button>
+    <strong id="edTitle">Retoucher</strong>
+    <button class="btn sm acc" id="edExport">Exporter en HD</button>
+  </div>
+  <div class="ed-prev">
+    <canvas id="edCv"></canvas>
+    <button class="hold" id="edHold">Maintiens pour voir l’original</button>
+  </div>
+  <div class="ed-body">
+    <div>
+      <h3>Rendu</h3>
+      <div class="styles mini">
+        <button class="style" data-edstyle="iphone" aria-pressed="true"><b>iPhone 16 Pro Max</b><small>Lumineux, net, éclatant</small></button>
+        <button class="style" data-edstyle="pro" aria-pressed="false"><b>Appareil photo pro</b><small>Contrasté, naturel</small></button>
+      </div>
+    </div>
+    <div>
+      <h3>Ambiance</h3>
+      <div class="chips" id="edLooks"></div>
+    </div>
+    <div class="row">
+      <label for="edScene">Type de photo</label>
+      <select id="edScene"></select>
+    </div>
+    <div id="edSliders" class="opts"></div>
+    <div class="actions">
+      <button class="btn" id="edReset">Réinitialiser</button>
+      <button class="btn" id="edAll">Appliquer à toutes</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script type="text/plain" id="engine">
+/* ===================== MOTEUR PHOTOPRO v2 ===================== */
+const cl = (v, a, b) => v < a ? a : (v > b ? b : v);
+const sstep = (a, b, x) => { const t = cl((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+
+const S2L = new Float32Array(1024);
+for (let i = 0; i < 1024; i++) { const c = i / 1023; S2L[i] = c <= .04045 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); }
+const L2S = new Float32Array(4096);
+for (let i = 0; i < 4096; i++) { const c = i / 4095; L2S[i] = c <= .0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - .055; }
+
+/* ---------- Profils ---------- */
+const STYLES = {
+  iphone: { target:.47, expMin:.80, hdr:.40, sh:.16, hl:.18, clar:.50, con:.15, film:0,   bp:.004, sat:1.08, vib:.42, warm:.010,
+            sharp:1.0, dn:.80, cdn:.85, kRoll:.80, vig:0,   grain:0, green:.14, blue:.12, warmBoost:0, skinKeep:.75,
+            tS:[0,0,0], tH:[0,0,0] },
+  pro:    { target:.43, expMin:.70, hdr:.24, sh:.08, hl:.22, clar:.30, con:.34, film:.22, bp:.016, sat:1.00, vib:.30, warm:.004,
+            sharp:.60, dn:.62, cdn:.80, kRoll:.68, vig:.15, grain:0, green:.10, blue:.16, warmBoost:0, skinKeep:.85,
+            tS:[-.004,0,.009], tH:[.010,.004,-.008] }
+};
+const LOOKS = {
+  std:   {},
+  vivid: { sat:.08, vib:.15, con:.05, clar:.08 },
+  warm:  { warm:.025, tH:[.012,.006,-.010], tS:[.004,0,-.004] },
+  cine:  { sat:-.07, con:.10, vig:.08, grain:.012, film:.10, tS:[-.022,.002,.022], tH:[.026,.010,-.024] },
+  bw:    { bw:1, con:.12, film:.12, grain:.012, vig:.08 }
+};
+const SCENES = {
+  general:   {},
+  portrait:  { mul:{ clar:.45, sharp:.85, hdr:.85, dn:1.15 }, add:{ vig:.02 }, set:{ skinKeep:.6 } },
+  product:   { mul:{ clar:1.15, vib:.6 }, add:{ bp:-.006 }, set:{ target:.58, whiteBg:1 } },
+  landscape: { mul:{ hdr:1.15, clar:1.25 }, add:{ green:.10, blue:.10, sat:.03, con:.03 }, set:{ dehaze:1 } },
+  food:      { mul:{ clar:1.1 }, add:{ warm:.008, vib:.06, warmBoost:.14, sat:.03 } },
+  night:     { mul:{ dn:1.3, hdr:.85, clar:.6 }, set:{ target:.28, expMax:3.2, cdn:.97 } }
+};
+const NEUTRAL = { hdr:0, sh:0, hl:0, clar:0, con:0, film:0, bp:0, sat:1, vib:0, warm:0, sharp:0, vig:0, grain:0, green:0, blue:0, warmBoost:0, skinKeep:1 };
+
+function buildParams(cfg, scene) {
+  const t = cl((cfg.intensity == null ? 100 : cfg.intensity) / 100, 0, 1.5), A = cfg.adj || {};
+  const P = JSON.parse(JSON.stringify(STYLES[cfg.style] || STYLES.iphone));
+  const L = LOOKS[cfg.look] || {};
+  for (const k in L) {
+    if (k === 'bw') P.bw = 1;
+    else if (Array.isArray(L[k])) P[k] = P[k].map((v, i) => v + L[k][i]);
+    else P[k] = (P[k] || 0) + L[k];
+  }
+  const Sc = SCENES[scene] || {};
+  if (Sc.mul) for (const k in Sc.mul) P[k] *= Sc.mul[k];
+  if (Sc.add) for (const k in Sc.add) P[k] = (P[k] || 0) + Sc.add[k];
+  if (Sc.set) Object.assign(P, Sc.set);
+  for (const k in NEUTRAL) P[k] = NEUTRAL[k] + (P[k] - NEUTRAL[k]) * t;
+  P.tS = P.tS.map(v => v * t); P.tH = P.tH.map(v => v * t);
+  const tm = Math.min(t, 1.2);
+  P.dn = cl(P.dn * (.5 + .5 * tm), 0, .97);
+  P.cdn = cl(P.cdn * (.6 + .4 * tm), 0, .97);
+  // réglages manuels (−100 à +100)
+  const a = k => (A[k] || 0) / 100;
+  P.ev = a('exp') * 1.5;
+  P.con = cl(P.con + a('con') * .35, -.4, .75);
+  P.sat *= 1 + a('sat') * .6; P.vib += a('sat') * .2;
+  P.warm += a('warm') * .05;
+  P.sharp = Math.max(0, P.sharp + a('sharp') * .9);
+  P.clar = Math.max(-.6, P.clar + a('clar') * .6);
+  P.sh += a('sh') * .35; P.hl -= a('hl') * .35;
+  P.dn = cl(P.dn + a('dn') * .4, 0, .97); P.cdn = cl(P.cdn + a('dn') * .25, 0, .97);
+  P.vig = Math.max(0, P.vig + a('vig') * .35);
+  P.bokeh = cl(a('bokeh'), 0, 1);
+  return P;
+}
+
+/* ---------- Flous (moyenne glissante) ---------- */
+function boxMean(src, w, h, r) {
+  const out = new Float32Array(w * h), tmp = new Float32Array(w * h), div = 2 * r + 1;
+  for (let y = 0; y < h; y++) {
+    const o = y * w; let s = 0;
+    for (let i = -r; i <= r; i++) s += src[o + (i < 0 ? 0 : i >= w ? w - 1 : i)];
+    for (let x = 0; x < w; x++) {
+      tmp[o + x] = s / div;
+      const a = x + r + 1, b = x - r;
+      s += src[o + (a >= w ? w - 1 : a)] - src[o + (b < 0 ? 0 : b)];
+    }
+  }
+  const cs = new Float64Array(w);
+  for (let i = -r; i <= r; i++) { const o = (i < 0 ? 0 : i >= h ? h - 1 : i) * w; for (let x = 0; x < w; x++) cs[x] += tmp[o + x]; }
+  for (let y = 0; y < h; y++) {
+    const o = y * w;
+    for (let x = 0; x < w; x++) out[o + x] = cs[x] / div;
+    const a = y + r + 1, b = y - r, oa = (a >= h ? h - 1 : a) * w, ob = (b < 0 ? 0 : b) * w;
+    for (let x = 0; x < w; x++) cs[x] += tmp[oa + x] - tmp[ob + x];
+  }
+  return out;
+}
+
+function guidedFilter(I, Ps, w, h, r, eps) {
+  const N = w * h, mI = boxMean(I, w, h, r), II = new Float32Array(N);
+  for (let i = 0; i < N; i++) II[i] = I[i] * I[i];
+  const mII = boxMean(II, w, h, r), outs = [];
+  for (const P of Ps) {
+    const IP = new Float32Array(N);
+    for (let i = 0; i < N; i++) IP[i] = I[i] * P[i];
+    const mP = boxMean(P, w, h, r), mIP = boxMean(IP, w, h, r);
+    const A = new Float32Array(N), B = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      const v = mII[i] - mI[i] * mI[i], c = mIP[i] - mI[i] * mP[i], a = c / (v + eps);
+      A[i] = a; B[i] = mP[i] - a * mI[i];
+    }
+    const mA = boxMean(A, w, h, r), mB = boxMean(B, w, h, r), O = new Float32Array(N);
+    for (let i = 0; i < N; i++) O[i] = mA[i] * I[i] + mB[i];
+    outs.push(O);
+  }
+  return outs;
+}
+
+function blurU8(src, w, h, r, passes) {
+  const a = new Uint8ClampedArray(src.length), b = new Uint8ClampedArray(src.length), div = 2 * r + 1;
+  let inp = src;
+  for (let p = 0; p < passes; p++) {
+    for (let y = 0; y < h; y++) {
+      const o = y * w; let s = 0;
+      for (let i = -r; i <= r; i++) s += inp[o + (i < 0 ? 0 : i >= w ? w - 1 : i)];
+      for (let x = 0; x < w; x++) {
+        a[o + x] = s / div;
+        const u = x + r + 1, v = x - r;
+        s += inp[o + (u >= w ? w - 1 : u)] - inp[o + (v < 0 ? 0 : v)];
+      }
+    }
+    const cs = new Int32Array(w);
+    for (let i = -r; i <= r; i++) { const o = (i < 0 ? 0 : i >= h ? h - 1 : i) * w; for (let x = 0; x < w; x++) cs[x] += a[o + x]; }
+    for (let y = 0; y < h; y++) {
+      const o = y * w;
+      for (let x = 0; x < w; x++) b[o + x] = cs[x] / div;
+      const u = y + r + 1, v = y - r, ou = (u >= h ? h - 1 : u) * w, ov = (v < 0 ? 0 : v) * w;
+      for (let x = 0; x < w; x++) cs[x] += a[ou + x] - a[ov + x];
+    }
+    inp = b;
+  }
+  return b;
+}
+
+/* ---------- Image réduite (analyse, tons, couleurs) ---------- */
+function makeSmall(d, w, h) {
+  const f = Math.max(1, Math.round(Math.max(w, h) / 1024));
+  const gw = Math.max(2, Math.floor(w / f)), gh = Math.max(2, Math.floor(h / f));
+  const R = new Float32Array(gw * gh), G = new Float32Array(gw * gh), B = new Float32Array(gw * gh), inv = 1 / (f * f);
+  for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
+    let r = 0, g = 0, b = 0;
+    for (let yy = 0; yy < f; yy++) { let o = ((gy * f + yy) * w + gx * f) * 4; for (let xx = 0; xx < f; xx++, o += 4) { r += d[o]; g += d[o + 1]; b += d[o + 2]; } }
+    const i = gy * gw + gx; R[i] = r * inv; G[i] = g * inv; B[i] = b * inv;
+  }
+  return { f, gw, gh, R, G, B };
+}
+
+function analyze(sm) {
+  const { gw, gh, R, G, B } = sm, N = gw * gh, hist = new Uint32Array(256);
+  let sy = 0, skin = 0, white = 0, green = 0, sky = 0, warm = 0, dark = 0, satS = 0;
+  let nr = 0, ng = 0, nb = 0, nn = 0, wr = 0, wg = 0, wb = 0, wn = 0;
+  for (let i = 0; i < N; i++) {
+    const r = R[i], g = G[i], b = B[i], y = .299 * r + .587 * g + .114 * b;
+    hist[y | 0]++; sy += y;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), sat = (mx - mn) / (mx + 1e-3);
+    satS += sat;
+    if (y < 45) dark++;
+    const cb = 128 - .168736 * r - .331264 * g + .5 * b, cr = 128 + .5 * r - .418688 * g - .081312 * b;
+    const isSkin = y > 50 && sat > .12 && sat < .50 && cb >= 77 && cb <= 127 && cr >= 133 && cr <= 173 && r > g && r > b;
+    if (isSkin) skin++;
+    if (y > 205 && sat < .12) { white++; wr += r; wg += g; wb += b; wn++; }
+    if (g > r * 1.06 && g > b * 1.1 && sat > .2) green++;
+    if (b > r * 1.12 && b > g * .98 && sat > .18 && y > 80) sky++;
+    if (!isSkin && r >= g && g >= b && sat > .38 && y > 70) warm++;
+    if (sat < .32 && y > 40 && y < 225) { nr += r; ng += g; nb += b; nn++; }
+  }
+  const p = q => { let a = 0; const tg = q * N; for (let i = 0; i < 256; i++) { a += hist[i]; if (a >= tg) return i; } return 255; };
+  return { N, p, mean: sy / N, skin: skin / N, white: white / N, green: green / N, sky: sky / N, warm: warm / N, dark: dark / N,
+           satMean: satS / N, nr, ng, nb, nn, wr, wg, wb, wn };
+}
+
+function detectScene(a) {
+  if (a.dark > .55 || a.mean < 46) return 'night';
+  if (a.skin > .09 && a.warm < .35) return 'portrait';
+  if (a.white > .30 && a.satMean < .40) return 'product';
+  if (a.green + a.sky > .40) return 'landscape';
+  if (a.warm > .35) return 'food';
+  return 'general';
+}
+
+/* ---------- Flou d’arrière-plan (sujet détecté automatiquement) ---------- */
+function bokehField(sm, Ys, strength) {
+  const { gw, gh, R, G, B } = sm, M = gw * gh;
+  const ring = Math.max(2, Math.round(Math.min(gw, gh) * .08));
+  let br = 0, bg = 0, bb = 0, bn = 0;
+  for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) {
+    if (x < ring || x >= gw - ring || y < ring || y >= gh - ring) { const i = y * gw + x; br += R[i]; bg += G[i]; bb += B[i]; bn++; }
+  }
+  br /= bn; bg /= bn; bb /= bn;
+  const S = new Float32Array(M), Gr = new Float32Array(M);
+  for (let y = 0; y < gh; y++) {
+    const dy = (y / (gh - 1) - .5) * 2;
+    for (let x = 0; x < gw; x++) {
+      const i = y * gw + x, dx = (x / (gw - 1) - .5) * 2;
+      const dr = R[i] - br, dg = G[i] - bg, db = B[i] - bb;
+      S[i] = Math.min(1, Math.sqrt(dr * dr + dg * dg + db * db) / 255 * 2.2) * .6 + Math.exp(-(dx * dx * 1.8 + dy * dy * 2.4)) * .25;
+      const xl = x > 0 ? i - 1 : i, xr = x < gw - 1 ? i + 1 : i, yu = y > 0 ? i - gw : i, yd = y < gh - 1 ? i + gw : i;
+      Gr[i] = Math.abs(Ys[xr] - Ys[xl]) + Math.abs(Ys[yd] - Ys[yu]);
+    }
+  }
+  const pctOf = (arr, q) => { const st = Math.max(1, Math.floor(arr.length / 4096)), s = []; for (let i = 0; i < arr.length; i += st) s.push(arr[i]); s.sort((a, b) => a - b); return s[Math.min(s.length - 1, Math.floor(s.length * q))]; };
+  const Gs = boxMean(Gr, gw, gh, Math.max(3, Math.round(gw * .04)));
+  const g95 = Math.max(1e-3, pctOf(Gs, .95));
+  for (let i = 0; i < M; i++) S[i] += .15 * Math.min(1, Gs[i] / g95);
+  const sr = Math.max(3, Math.round(gw * .03));
+  const Sm = boxMean(boxMean(S, gw, gh, sr), gw, gh, sr);
+  const lo5 = pctOf(Sm, .05), hi95 = pctOf(Sm, .95), span = Math.max(1e-3, hi95 - lo5);
+  let mask = new Float32Array(M);
+  for (let i = 0; i < M; i++) mask[i] = sstep(.40, .62, (Sm[i] - lo5) / span);
+  const gI = new Float32Array(M);
+  for (let i = 0; i < M; i++) gI[i] = Ys[i] / 255;
+  mask = guidedFilter(gI, [mask], gw, gh, Math.max(3, Math.round(gw * .015)), .01)[0];
+  for (let i = 0; i < M; i++) mask[i] = cl(mask[i], 0, 1);
+  // flou du fond (les couleurs du sujet ne débordent pas sur le fond)
+  const rb = Math.max(4, Math.round(gw * .02)), W = new Float32Array(M);
+  for (let i = 0; i < M; i++) W[i] = 1 - mask[i];
+  const blur3 = a => boxMean(boxMean(boxMean(a, gw, gh, rb), gw, gh, rb), gw, gh, rb);
+  const nW = blur3(W), out = new Float32Array(M * 4);
+  [[R, 0], [G, 1], [B, 2]].forEach(([ch, k]) => {
+    const prod = new Float32Array(M);
+    for (let i = 0; i < M; i++) prod[i] = ch[i] * W[i];
+    const num = blur3(prod), pl = blur3(ch);
+    for (let i = 0; i < M; i++) out[i * 4 + k] = (num[i] + .02 * pl[i]) / (nW[i] + .02);
+  });
+  for (let i = 0; i < M; i++) out[i * 4 + 3] = (1 - mask[i]) * strength * .95;
+  return out;
+}
+
+/* ---------- Pipeline principal ---------- */
+function enhanceImage(d, w, h, cfg) {
+  const N = w * h, sm = makeSmall(d, w, h), an = analyze(sm);
+  const scene = (cfg.scene && cfg.scene !== 'auto' && SCENES[cfg.scene]) ? cfg.scene : detectScene(an);
+  const P = buildParams(cfg, scene);
+  const t = cl((cfg.intensity == null ? 100 : cfg.intensity) / 100, 0, 1.5), tb = Math.min(1, t);
+
+  // niveaux automatiques
+  const haze = an.p(.003) > 38 && (an.p(.997) - an.p(.003)) < 185;
+  if (haze || P.dehaze) { P.con += .06 * tb; P.vib += .08 * tb; }
+  let lo = Math.min(an.p(.003), haze ? 70 : 42) * tb;
+  const hiRaw = P.whiteBg ? cl(an.p(1 - .5 * an.white), 185, 250) : Math.max(an.p(.997), 200);
+  let hi = 255 - (255 - hiRaw) * tb;
+  if (hi - lo < 110) { lo = 0; hi = 255; }
+  const inv = 1 / (hi - lo);
+
+  // balance des blancs
+  let gr = 1, gb = 1;
+  if (tb > 0) {
+    let ref = null, strength = .55;
+    if (P.whiteBg && an.wn > .03 * an.N) { ref = [an.wr / an.wn, an.wg / an.wn, an.wb / an.wn]; strength = .85; }
+    else if (an.nn > .04 * an.N) { ref = [an.nr / an.nn, an.ng / an.nn, an.nb / an.nn]; strength = (scene === 'portrait' || scene === 'food') ? .30 : .55; }
+    if (ref) {
+      gr = 1 + (cl(ref[1] / Math.max(ref[0], 1), .85, 1.18) - 1) * strength * tb;
+      gb = 1 + (cl(ref[1] / Math.max(ref[2], 1), .85, 1.18) - 1) * strength * tb;
+    }
+  }
+
+  // exposition
+  const mN = cl((an.p(.5) - lo) * inv, .02, .98);
+  let E = Math.pow(S2L[(P.target * 1023) | 0] / S2L[(mN * 1023) | 0], .75 * tb);
+  E = cl(E, P.expMin || .8, P.expMax || 2.4) * Math.pow(2, P.ev || 0);
+
+  // couche de base (tons locaux) + chroma lissé, sur l’image réduite
+  const { gw, gh, R, G, B, f: fs } = sm, M = gw * gh, gmax = Math.max(gw, gh);
+  const Ys = new Float32Array(M), lnY = new Float32Array(M);
+  for (let i = 0; i < M; i++) {
+    const r = R[i], g = G[i], b = B[i]; Ys[i] = .299 * r + .587 * g + .114 * b;
+    const lr = S2L[(cl((r - lo) * inv, 0, 1) * 1023 + .5) | 0] * gr * E;
+    const lg = S2L[(cl((g - lo) * inv, 0, 1) * 1023 + .5) | 0] * E;
+    const lb2 = S2L[(cl((b - lo) * inv, 0, 1) * 1023 + .5) | 0] * gb * E;
+    lnY[i] = Math.log(.2126 * lr + .7152 * lg + .0722 * lb2 + 1e-4);
+  }
+  const base = guidedFilter(lnY, [lnY], gw, gh, Math.max(4, Math.round(gmax * .035)), .06)[0];
+  const sstp = Math.max(1, Math.floor(M / 4096)), samp = [];
+  for (let i = 0; i < M; i += sstp) samp.push(base[i]);
+  samp.sort((a, b) => a - b);
+  const lp = samp[samp.length >> 1], rng = samp[Math.floor(samp.length * .95)] - samp[Math.floor(samp.length * .05)];
+  const hdrE = P.hdr * cl((rng - 1.2) / 2, .15, 1);
+
+  const gI = new Float32Array(M), cR = new Float32Array(M), cB = new Float32Array(M);
+  for (let i = 0; i < M; i++) { gI[i] = Ys[i] / 255; cR[i] = R[i] - Ys[i]; cB[i] = B[i] - Ys[i]; }
+  const [sR, sB] = guidedFilter(gI, [cR, cB], gw, gh, Math.max(3, Math.round(gmax / 150)), .0025);
+  const F = new Float32Array(M * 8);
+  for (let i = 0; i < M; i++) { F[i * 8] = sR[i]; F[i * 8 + 1] = sB[i]; F[i * 8 + 2] = base[i]; }
+  const bk = P.bokeh > .01;
+  if (bk) {
+    const bf = bokehField(sm, Ys, P.bokeh);
+    for (let i = 0; i < M; i++) { F[i * 8 + 3] = bf[i * 4 + 3]; F[i * 8 + 4] = bf[i * 4]; F[i * 8 + 5] = bf[i * 4 + 1]; F[i * 8 + 6] = bf[i * 4 + 2]; }
+  }
+
+  // débruitage / netteté : luminance + estimation du bruit
+  const Yl = new Uint8ClampedArray(N);
+  for (let p = 0, o = 0; p < N; p++, o += 4) Yl[p] = .299 * d[o] + .587 * d[o + 1] + .114 * d[o + 2];
+  const r1 = Math.max(1, Math.round(Math.max(w, h) / 2200));
+  const bl = blurU8(Yl, w, h, r1, 2);
+  const ev = new Uint32Array(64); let ec = 0;
+  const stp = Math.max(1, Math.floor(N / 60000));
+  for (let i = 0; i < N; i += stp) { const e = Math.abs(Yl[i] - bl[i]); ev[e > 63 ? 63 : e | 0]++; ec++; }
+  let acc = 0, emed = 0;
+  for (let i = 0; i < 64; i++) { acc += ev[i]; if (acc >= ec / 2) { emed = i; break; } }
+  const T = cl(4 + emed * 5.5, 8, 30);
+  const sharpK = P.sharp * (cfg.up ? 1.15 : 1), LIM = 38;
+
+  // interpolation bilinéaire image réduite → pleine taille
+  const IX0 = new Int32Array(w), IX1 = new Int32Array(w), FX = new Float32Array(w);
+  for (let x = 0; x < w; x++) {
+    const u = (x + .5) / fs - .5, x0 = Math.floor(u);
+    FX[x] = u - x0; IX0[x] = cl(x0, 0, gw - 1); IX1[x] = cl(x0 + 1, 0, gw - 1);
+  }
+
+  const dn = P.dn, cdn = P.cdn, kR = P.kRoll, con = P.con, film = P.film || 0, bp = P.bp;
+  const sat0 = P.sat, vib = P.vib, greenK = P.green, blueK = P.blue, wbK = P.warmBoost, skinK = P.skinKeep;
+  const tS = P.tS, tH = P.tH, warm = P.warm, vig = P.vig, grain = P.grain, bw = !!P.bw, clar = P.clar, sh = P.sh, hl = P.hl;
+  const kS = (con !== 0 || film !== 0);
+  let seed = 123456789;
+  const cx = w / 2, cy = h / 2;
+
+  for (let y = 0; y < h; y++) {
+    const vy = (y + .5) / fs - .5; let y0 = Math.floor(vy); const ty = vy - y0; let y1 = y0 + 1;
+    y0 = cl(y0, 0, gh - 1); y1 = cl(y1, 0, gh - 1);
+    const rw0 = y0 * gw, rw1 = y1 * gw, dy = (y - cy) / cy, dy2 = dy * dy;
+    for (let x = 0; x < w; x++) {
+      const p = y * w + x, o = p * 4;
+      const x0 = IX0[x], x1 = IX1[x], tx = FX[x];
+      const a0 = (rw0 + x0) << 3, a1 = (rw0 + x1) << 3, a2 = (rw1 + x0) << 3, a3 = (rw1 + x1) << 3;
+      const w00 = (1 - tx) * (1 - ty), w10 = tx * (1 - ty), w01 = (1 - tx) * ty, w11 = tx * ty;
+      const csR = F[a0] * w00 + F[a1] * w10 + F[a2] * w01 + F[a3] * w11;
+      const csB = F[a0 + 1] * w00 + F[a1 + 1] * w10 + F[a2 + 1] * w01 + F[a3 + 1] * w11;
+      const lb = F[a0 + 2] * w00 + F[a1 + 2] * w10 + F[a2 + 2] * w01 + F[a3 + 2] * w11;
+
+      let r = d[o], g = d[o + 1], b = d[o + 2];
+      // luminance : débruitage adaptatif + netteté
+      const Yo = .299 * r + .587 * g + .114 * b, Yb = bl[p], e = Yo > Yb ? Yo - Yb : Yb - Yo;
+      const wd = dn * Math.max(0, 1 - e / T);
+      const Y1 = Yo + wd * (Yb - Yo) + cl(sharpK * (1 - wd) * (Yo - Yb), -LIM, LIM);
+      // chrominance : lissage guidé par la luminance
+      let cr = r - Yo, cb = b - Yo;
+      const dcm = Math.abs(cr - csR) + Math.abs(cb - csB), wc = cdn * Math.max(0, 1 - dcm / 40);
+      cr += wc * (csR - cr); cb += wc * (csB - cb);
+      const cg = -(.299 * cr + .114 * cb) / .587;
+      r = Y1 + cr; g = Y1 + cg; b = Y1 + cb;
+
+      if (bk) {
+        const bw2 = F[a0 + 3] * w00 + F[a1 + 3] * w10 + F[a2 + 3] * w01 + F[a3 + 3] * w11;
+        if (bw2 > .004) {
+          const bR = F[a0 + 4] * w00 + F[a1 + 4] * w10 + F[a2 + 4] * w01 + F[a3 + 4] * w11;
+          const bG = F[a0 + 5] * w00 + F[a1 + 5] * w10 + F[a2 + 5] * w01 + F[a3 + 5] * w11;
+          const bB = F[a0 + 6] * w00 + F[a1 + 6] * w10 + F[a2 + 6] * w01 + F[a3 + 6] * w11;
+          r += bw2 * (bR - r); g += bw2 * (bG - g); b += bw2 * (bB - b);
+        }
+      }
+
+      // niveaux → lumière linéaire
+      r = (r - lo) * inv; g = (g - lo) * inv; b = (b - lo) * inv;
+      r = r < 0 ? 0 : r > 1 ? 1 : r; g = g < 0 ? 0 : g > 1 ? 1 : g; b = b < 0 ? 0 : b > 1 ? 1 : b;
+      r = S2L[(r * 1023 + .5) | 0] * gr * E; g = S2L[(g * 1023 + .5) | 0] * E; b = S2L[(b * 1023 + .5) | 0] * gb * E;
+
+      // tons locaux : compression de la base + détails
+      const Y = .2126 * r + .7152 * g + .0722 * b + 1e-4, ld = Math.log(Y) - lb;
+      const dwt = (Y - .004) / .046, dw = dwt <= 0 ? 0 : dwt >= 1 ? 1 : dwt * dwt * (3 - 2 * dwt);
+      const dl = lb - lp;
+      let lbn = lp + dl * (1 - hdrE);
+      if (dl < 0) lbn += sh * Math.min(1, -dl / 2.2); else lbn -= hl * Math.min(1, dl / 2.2);
+      let ratio = Math.exp(lbn - lb + clar * dw * ld);
+      if (ratio > 6) ratio = 6;
+      r *= ratio; g *= ratio; b *= ratio;
+
+      // épaule douce des hautes lumières
+      let m = r > g ? (r > b ? r : b) : (g > b ? g : b);
+      if (m > kR) { const m2 = kR + (1 - kR) * (1 - Math.exp(-(m - kR) / (1 - kR))), s = m2 / m; r *= s; g *= s; b *= s; }
+      r = L2S[((r > 1 ? 1 : r) * 4095 + .5) | 0]; g = L2S[((g > 1 ? 1 : g) * 4095 + .5) | 0]; b = L2S[((b > 1 ? 1 : b) * 4095 + .5) | 0];
+
+      // contraste (luminance) + courbe film (par canal)
+      if (kS) {
+        const Yp = .299 * r + .587 * g + .114 * b, Yc = Yp + con * (Yp * Yp * (3 - 2 * Yp) - Yp), rt = (Yc + .01) / (Yp + .01);
+        r *= rt; g *= rt; b *= rt;
+        m = r > g ? (r > b ? r : b) : (g > b ? g : b);
+        if (m > 1) { r /= m; g /= m; b /= m; }
+        if (film) { r += film * (r * r * (3 - 2 * r) - r); g += film * (g * g * (3 - 2 * g) - g); b += film * (b * b * (3 - 2 * b) - b); }
+      }
+      if (bp) { const ib = 1 / (1 - bp); r = (r - bp) * ib; g = (g - bp) * ib; b = (b - bp) * ib; r = r < 0 ? 0 : r; g = g < 0 ? 0 : g; b = b < 0 ? 0 : b; }
+
+      let gy = .299 * r + .587 * g + .114 * b;
+      if (bw) {
+        const v = .30 * r + .55 * g + .15 * b; r = g = b = v; gy = v;
+      } else {
+        // couleurs : saturation, vibrance, teintes ciblées, peaux protégées
+        const mx = r > g ? (r > b ? r : b) : (g > b ? g : b), mn = r < g ? (r < b ? r : b) : (g < b ? g : b);
+        const sat = (mx - mn) / (mx + 1e-4);
+        let mult = sat0 * (1 + vib * (1 - sat));
+        if (sat > .02) {
+          if (g >= r && g >= b) mult *= 1 + greenK * sat;
+          else if (b >= r && b >= g) mult *= 1 + blueK * sat;
+          else if (r >= g) {
+            const hr = (g - b) / (mx - mn + 1e-4);
+            if (hr > .12 && hr < .62 && sat > .16 && sat < .70) mult = 1 + (mult - 1) * skinK;
+            else mult *= 1 + wbK * sat;
+          }
+        }
+        r = gy + (r - gy) * mult; g = gy + (g - gy) * mult; b = gy + (b - gy) * mult;
+      }
+      // teintes ombres / hautes lumières, chaleur
+      const sw = (1 - gy) * (1 - gy), hw = gy * gy;
+      r += tS[0] * sw + tH[0] * hw; g += tS[1] * sw + tH[1] * hw; b += tS[2] * sw + tH[2] * hw;
+      r *= 1 + warm; b *= 1 - warm;
+
+      if (vig > 0) { const dx = (x - cx) / cx, dd = dx * dx + dy2 - .35; if (dd > 0) { const vf = 1 - vig * dd * .6; r *= vf; g *= vf; b *= vf; } }
+      if (grain > 0) { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; const nz = (seed / 4294967296 - .5) * grain * 4 * gy * (1 - gy) * 2; r += nz; g += nz; b += nz; }
+
+      d[o] = r * 255; d[o + 1] = g * 255; d[o + 2] = b * 255;
+    }
+  }
+  return { scene, noise: emed };
+}
+
+</script>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const MAX = 20;
+const clone = o => JSON.parse(JSON.stringify(o));
+const tick = (ms = 30) => new Promise(r => setTimeout(r, ms));
+const esc = s => s.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+
+const LOOKS_UI = [['std','Standard'],['vivid','Éclatant'],['warm','Chaud'],['cine','Cinéma'],['bw','Noir & blanc']];
+const SCENES_UI = [['auto','Auto (recommandé)'],['portrait','Portrait'],['product','Produit sur fond clair'],['landscape','Paysage'],['food','Nourriture'],['night','Faible lumière'],['general','Général']];
+const SCENE_FR = { general:'Général', portrait:'Portrait', product:'Produit', landscape:'Paysage', food:'Nourriture', night:'Faible lumière' };
+const ADJ_UI = [
+  ['exp','Luminosité',-100,100],['con','Contraste',-100,100],['sat','Couleurs',-100,100],['warm','Chaleur',-100,100],
+  ['sh','Ombres',-100,100],['hl','Hautes lumières',-100,100],['clar','Détails',-100,100],['sharp','Netteté',-100,100],
+  ['dn','Réduction du bruit',-100,100],['vig','Vignette',0,100],['bokeh','Flou d’arrière-plan',0,100]
+];
+
+/* ---------- Moteur (dans un Worker pour garder l’écran fluide) ---------- */
+const ENGINE_SRC = document.getElementById('engine').textContent;
+const GLUE = `;onmessage=function(e){var m=e.data;try{var d=new Uint8ClampedArray(m.buf);var info=enhanceImage(d,m.w,m.h,m.cfg);postMessage({id:m.id,buf:d.buffer,info:info},[d.buffer]);}catch(err){postMessage({id:m.id,err:String(err&&err.message||err)});}};`;
+let worker = null, jobId = 0, mainEngine = null;
+const pending = new Map();
+function initWorker(){
+  try {
+    const url = URL.createObjectURL(new Blob([ENGINE_SRC + GLUE], { type:'text/javascript' }));
+    worker = new Worker(url);
+    worker.onmessage = e => {
+      const m = e.data, p = pending.get(m.id); if (!p) return;
+      pending.delete(m.id);
+      m.err ? p.rej(new Error(m.err)) : p.res({ buf:m.buf, info:m.info });
+    };
+    worker.onerror = () => { worker = null; pending.forEach(p => p.rej(new Error('worker'))); pending.clear(); };
+  } catch(e){ worker = null; }
+}
+function runEngine(buf, w, h, cfg){
+  return new Promise((res, rej) => {
+    if (worker){
+      const id = ++jobId; pending.set(id, { res, rej });
+      worker.postMessage({ id, buf, w, h, cfg }, [buf]);
+    } else {
+      setTimeout(() => {
+        try {
+          if (!mainEngine) mainEngine = new Function(ENGINE_SRC + ';return {enhanceImage:enhanceImage};')();
+          const d = new Uint8ClampedArray(buf), info = mainEngine.enhanceImage(d, w, h, cfg);
+          res({ buf:d.buffer, info });
+        } catch(e){ rej(e); }
+      }, 0);
+    }
+  });
+}
+function cancelWork(){
+  if (worker){ worker.terminate(); pending.forEach(p => p.rej(new Error('cancel'))); pending.clear(); initWorker(); }
+}
+initWorker();
+
+/* ---------- Lecture et redimensionnement des images ---------- */
+async function loadBitmap(file){
+  try { return await createImageBitmap(file, { imageOrientation:'from-image' }); }
+  catch(e){
+    return await new Promise((res, rej) => {
+      const img = new Image(), u = URL.createObjectURL(file);
+      img.onload = () => res(img); img.onerror = () => rej(new Error('format'));
+      img.src = u;
+    });
+  }
+}
+async function renderTo(src, sx, sy, cw, ch, tw, th){
+  let w0 = cw, h0 = ch;
+  if (cw > tw * 2){ w0 = tw * 2; h0 = Math.round(ch * w0 / cw); }
+  let cur = document.createElement('canvas'); cur.width = w0; cur.height = h0;
+  let c = cur.getContext('2d'); c.imageSmoothingQuality = 'high';
+  c.drawImage(src, sx, sy, cw, ch, 0, 0, w0, h0);
+  while (cur.width !== tw){
+    const nw = cur.width < tw ? Math.min(tw, Math.round(cur.width * 1.5)) : cur.width > tw * 2 ? Math.round(cur.width / 2) : tw;
+    const nh = nw === tw ? th : Math.round(cur.height * nw / cur.width);
+    const nc = document.createElement('canvas'); nc.width = nw; nc.height = nh;
+    c = nc.getContext('2d'); c.imageSmoothingQuality = 'high'; c.drawImage(cur, 0, 0, nw, nh);
+    cur.width = cur.height = 0; cur = nc; await tick(0);
+  }
+  if (cur.height !== th){
+    const nc = document.createElement('canvas'); nc.width = tw; nc.height = th;
+    c = nc.getContext('2d'); c.imageSmoothingQuality = 'high'; c.drawImage(cur, 0, 0, tw, th);
+    cur.width = cur.height = 0; cur = nc;
+  }
+  return cur;
+}
+function cropRect(sw, sh, mode){
+  const A = { '1:1':1, '4:5':4/5, '9:16':9/16, '16:9':16/9 }[mode];
+  if (!A) return { sx:0, sy:0, cw:sw, ch:sh };
+  let cw = sw, ch = Math.round(sw / A);
+  if (ch > sh){ ch = sh; cw = Math.round(sh * A); }
+  return { sx:Math.round((sw - cw) / 2), sy:Math.round((sh - ch) / 2), cw, ch };
+}
+async function makePreview(file, maxLong){
+  const bm = await loadBitmap(file);
+  const sw = bm.width || bm.naturalWidth, sh = bm.height || bm.naturalHeight, sc = Math.min(1, maxLong / Math.max(sw, sh));
+  const w = Math.max(2, Math.round(sw * sc)), h = Math.max(2, Math.round(sh * sc));
+  const cv = await renderTo(bm, 0, 0, sw, sh, w, h);
+  if (bm.close) bm.close();
+  const data = cv.getContext('2d', { willReadFrequently:true }).getImageData(0, 0, w, h).data;
+  cv.width = cv.height = 0;
+  return { w, h, data };
+}
+const toBlobP = (cv, type, q) => new Promise(res => cv.toBlob(res, type, q));
+
+async function enhance(file, o){
+  const bm = await loadBitmap(file);
+  const sw = bm.width || bm.naturalWidth, sh = bm.height || bm.naturalHeight;
+  const { sx, sy, cw, ch } = cropRect(sw, sh, o.crop);
+  const long = Math.max(cw, ch);
+  let target = o.res === 'orig' ? Math.min(long, 4096) : o.res === '4k' ? 4096 : (long < 2560 ? 2560 : Math.min(long, 3200));
+  if (o.cap) target = Math.min(target, o.cap);
+  let tw = Math.round(cw * target / long), th = Math.round(ch * target / long);
+  const MAXPX = 14e6;
+  if (tw * th > MAXPX){ const s = Math.sqrt(MAXPX / (tw * th)); tw = Math.round(tw * s); th = Math.round(th * s); }
+  const cv = await renderTo(bm, sx, sy, cw, ch, tw, th);
+  if (bm.close) bm.close();
+  const ctx = cv.getContext('2d', { willReadFrequently:true });
+  const img = ctx.getImageData(0, 0, tw, th);
+  const out = await runEngine(img.data.buffer, tw, th, { style:o.style, look:o.look, scene:o.scene, intensity:o.intensity, adj:o.adj, up:tw / cw > 1.2 });
+  ctx.putImageData(new ImageData(new Uint8ClampedArray(out.buf), tw, th), 0, 0);
+  const blob = await toBlobP(cv, o.fmt === 'png' ? 'image/png' : 'image/jpeg', .95);
+  cv.width = cv.height = 0;
+  if (!blob) throw new Error('export');
+  return { blob, w:tw, h:th, scene:out.info.scene };
+}
+
+/* ---------- État ---------- */
+let items = [], busy = false, uid = 0, cancelled = false;
+const G = { style:'iphone', look:'std', scene:'auto', intensity:100, adj:{ bokeh:0 }, res:'hd', fmt:'jpg', crop:'orig' };
+try { Object.assign(G, JSON.parse(localStorage.getItem('photopro.v2') || '{}')); G.adj = Object.assign({ bokeh:0 }, G.adj); } catch(e){}
+const persist = () => { try { localStorage.setItem('photopro.v2', JSON.stringify(G)); } catch(e){} };
+const effOpts = it => it.opts ? clone(it.opts) : { style:G.style, look:G.look, scene:G.scene, intensity:G.intensity, adj:clone(G.adj) };
+
+function toast(msg){
+  const el = $('#toast'); el.textContent = msg; el.classList.add('on');
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2800);
+}
+function outName(it, idx){
+  const base = it.name.replace(/\.[^.]+$/, '') || 'photo';
+  const ext = it.fmt === 'png' ? 'png' : 'jpg';
+  return `${idx != null ? String(idx + 1).padStart(2, '0') + '_' : ''}${base}_PhotoPro_${it.styleTag || 'HD'}.${ext}`;
+}
+function save(blob, name){
+  const a = document.createElement('a'), u = URL.createObjectURL(blob);
+  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 4000);
+}
+
+/* ---------- Interface principale ---------- */
+function chipsHtml(sel){ return LOOKS_UI.map(([k, n]) => `<button class="chip" data-look="${k}" aria-pressed="${k === sel}">${n}</button>`).join(''); }
+function sceneOptions(sel){ return SCENES_UI.map(([k, n]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${n}</option>`).join(''); }
+
+function syncGlobalUI(){
+  document.querySelectorAll('.style[data-style]').forEach(b => b.setAttribute('aria-pressed', b.dataset.style === G.style));
+  $('#looks').innerHTML = chipsHtml(G.look);
+  $('#scene').innerHTML = sceneOptions(G.scene);
+  $('#int').value = G.intensity; $('#intOut').textContent = G.intensity + ' %';
+  $('#bokeh').value = G.adj.bokeh || 0; $('#bokehOut').textContent = (G.adj.bokeh || 0) + ' %';
+  $('#res').value = G.res; $('#fmt').value = G.fmt; $('#crop').value = G.crop;
+}
+
+function render(){
+  $('#count').textContent = `${items.length}/${MAX}`;
+  $('#empty').style.display = items.length ? 'none' : 'block';
+  $('#grid').innerHTML = items.map(it => {
+    const badge = it.status === 'done' ? '<span class="b ok">Prête</span>'
+      : it.status === 'busy' ? '<span class="b wk">En cours…</span>'
+      : it.status === 'err'  ? '<span class="b er">Erreur</span>' : `<span class="b">${it.opts ? 'Personnalisée' : 'En attente'}</span>`;
+    const info = it.status === 'done' ? `${it.dim} · ${SCENE_FR[it.scene] || ''}` : it.status === 'err' ? (it.err || 'Échec') : esc(it.name);
+    return `<div class="item">
+      <div class="thumb"><img src="${it.resUrl || it.origUrl}" alt="" loading="lazy">${badge}</div>
+      <div class="meta">${info}</div>
+      <div class="tools">
+        <button data-act="edit" data-id="${it.id}" ${busy ? 'disabled' : ''}>Retoucher</button>
+        ${it.status === 'done' ? `<button data-act="cmp" data-id="${it.id}">Comparer</button>
+        <a class="dl" href="${it.resUrl}" download="${esc(outName(it))}">Télécharger</a>` : ''}
+        <button data-act="redo" data-id="${it.id}" ${busy ? 'disabled' : ''}>Refaire</button>
+        <button data-act="del" data-id="${it.id}" ${busy ? 'disabled' : ''}>Retirer</button>
+      </div></div>`;
+  }).join('');
+  const anyDone = items.some(i => i.status === 'done');
+  $('#zip').disabled = !anyDone || busy;
+  $('#share').disabled = !anyDone || busy;
+  $('#clear').disabled = !items.length || busy;
+  $('#go').disabled = busy;
+}
+
+function addFiles(list){
+  const files = [...list].filter(f => f.type.startsWith('image/') || /\.(heic|heif|jpe?g|png|webp)$/i.test(f.name));
+  if (!files.length){ toast('Choisis des fichiers image.'); return; }
+  const room = MAX - items.length;
+  if (files.length > room) toast(room > 0 ? `Maximum ${MAX} photos : ${files.length - room} ignorée(s).` : `Déjà ${MAX} photos. Retire-en pour en ajouter.`);
+  files.slice(0, Math.max(0, room)).forEach(f => items.push({ id:++uid, file:f, name:f.name, origUrl:URL.createObjectURL(f), status:'wait' }));
+  render(); schedulePreviews();
+}
+
+/* ---------- Aperçus des deux rendus (sur la première photo) ---------- */
+let pvTimer = null, pvSeq = 0, pvSrc = null;
+function schedulePreviews(){ clearTimeout(pvTimer); pvTimer = setTimeout(refreshPreviews, 220); }
+async function refreshPreviews(){
+  if (busy || (ed && ed.open)) return;
+  const seq = ++pvSeq, it = items[0];
+  ['iphone', 'pro'].forEach(s => { $('#pv-' + s).hidden = !it; $('#ph-' + s).hidden = !!it; });
+  if (!it) return;
+  try {
+    if (!pvSrc || pvSrc.id !== it.id){ const p = await makePreview(it.file, 380); pvSrc = { id:it.id, ...p }; }
+    for (const s of ['iphone', 'pro']){
+      if (seq !== pvSeq) return;
+      const copy = pvSrc.data.slice();
+      const r = await runEngine(copy.buffer, pvSrc.w, pvSrc.h, { style:s, look:G.look, scene:G.scene, intensity:G.intensity, adj:G.adj });
+      if (seq !== pvSeq) return;
+      const cv = $('#pv-' + s); cv.width = pvSrc.w; cv.height = pvSrc.h;
+      cv.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(r.buf), pvSrc.w, pvSrc.h), 0, 0);
+    }
+  } catch(e){ /* aperçu facultatif */ }
+}
+
+/* ---------- Traitement par lots ---------- */
+function setProg(done, total, txt){
+  $('#prog').classList.add('on');
+  $('#bar').style.width = (total ? done / total * 100 : 0) + '%';
+  $('#progTxt').textContent = txt;
+}
+async function processAll(onlyId){
+  if (busy) return;
+  const list = onlyId ? items.filter(i => i.id === onlyId) : items;
+  if (!list.length){ toast('Ajoute d’abord des photos.'); return; }
+  busy = true; cancelled = false; render(); $('#cancel').hidden = false;
+  let done = 0, ok = 0;
+  for (const it of list){
+    if (cancelled) break;
+    const o = { ...effOpts(it), res:G.res, fmt:G.fmt, crop:G.crop };
+    const sig = JSON.stringify(o);
+    if (!onlyId && it.status === 'done' && it.sig === sig){ done++; ok++; continue; }
+    it.status = 'busy'; render();
+    setProg(done, list.length, `Photo ${done + 1} sur ${list.length} : ${it.name}`);
+    await tick(50);
+    try {
+      let r;
+      try { r = await enhance(it.file, o); }
+      catch(e1){ if (e1.message === 'cancel') throw e1; console.warn(e1); await tick(100); r = await enhance(it.file, { ...o, cap:2600 }); }
+      if (it.resUrl) URL.revokeObjectURL(it.resUrl);
+      it.resBlob = r.blob; it.resUrl = URL.createObjectURL(r.blob);
+      it.dim = `${r.w} × ${r.h} px`; it.scene = r.scene; it.fmt = o.fmt; it.sig = sig; it.status = 'done';
+      it.styleTag = o.style === 'pro' ? 'Pro' : 'iPhone'; ok++;
+    } catch(e){
+      if (e.message === 'cancel'){ it.status = 'wait'; break; }
+      console.error(e); it.status = 'err'; it.err = 'Image illisible (HEIC ? convertis en JPG)';
+    }
+    done++; render();
+  }
+  items.forEach(i => { if (i.status === 'busy') i.status = 'wait'; });
+  busy = false; $('#cancel').hidden = true; render();
+  if (cancelled) setProg(done, list.length, 'Traitement annulé.');
+  else { setProg(done, list.length, ok === list.length ? 'Terminé.' : `Terminé : ${ok} sur ${list.length} réussie(s).`); toast(ok ? 'Photos prêtes. Compare, puis télécharge.' : 'Aucune photo n’a pu être traitée.'); }
+  schedulePreviews();
+}
+
+async function zipAll(){
+  const ready = items.filter(i => i.status === 'done');
+  if (!ready.length) return;
+  if (!window.JSZip){
+    toast('ZIP indisponible : téléchargement un par un.');
+    ready.forEach((it, i) => setTimeout(() => save(it.resBlob, outName(it)), i * 600));
+    return;
+  }
+  toast('Création du ZIP…');
+  const z = new JSZip();
+  ready.forEach((it, i) => z.file(outName(it, i), it.resBlob));
+  const blob = await z.generateAsync({ type:'blob', compression:'STORE' });
+  save(blob, `PhotoPro_${new Date().toISOString().slice(0, 10)}.zip`);
+}
+async function shareAll(){
+  const ready = items.filter(i => i.status === 'done');
+  const files = ready.map((it, i) => new File([it.resBlob], outName(it, i), { type:it.resBlob.type }));
+  if (navigator.canShare && navigator.canShare({ files })){
+    try { await navigator.share({ files }); } catch(e){ /* annulé */ }
+  } else toast('Partage indisponible ici : utilise le ZIP.');
+}
+
+/* ---------- Comparaison avant / après ---------- */
+function openCmp(id){
+  const it = items.find(i => i.id === id); if (!it || !it.resUrl) return;
+  const [w, h] = it.dim.replace(' px', '').split(' × ').map(Number);
+  const c = $('#cmp'); c.style.aspectRatio = `${w}/${h}`; c.style.width = `min(100%, calc(70vh * ${w / h}))`;
+  $('#cmpBot').src = it.resUrl; $('#cmpTop').src = it.origUrl;
+  $('#cmpRange').value = 50; setCmp(50);
+  $('#modal').classList.add('on');
+}
+function setCmp(v){ $('#cmpTop').style.clipPath = `inset(0 ${100 - v}% 0 0)`; $('#cmpLine').style.left = v + '%'; }
+
+/* ---------- Éditeur (retouche fine avec aperçu en direct) ---------- */
+let ed = null, edBusy = false, edDirty = false, edTimer = null;
+async function openEditor(id){
+  if (busy) return;
+  const it = items.find(i => i.id === id); if (!it) return;
+  $('#editor').classList.add('on'); document.body.style.overflow = 'hidden';
+  $('#edTitle').textContent = 'Chargement…';
+  try {
+    const src = await makePreview(it.file, 1100);
+    const opts = clone(it.opts || effOpts(it)); opts.adj = Object.assign({}, opts.adj);
+    ed = { open:true, it, src, opts, orig:new ImageData(new Uint8ClampedArray(src.data), src.w, src.h), res:null, scene:null };
+    $('#edTitle').textContent = it.name.length > 22 ? it.name.slice(0, 20) + '…' : it.name;
+    buildEditor(); runEdPreview();
+  } catch(e){ closeEditor(); toast('Impossible d’ouvrir cette photo.'); }
+}
+function closeEditor(){
+  $('#editor').classList.remove('on'); document.body.style.overflow = '';
+  if (ed) ed.open = false; ed = null; schedulePreviews();
+}
+function buildEditor(){
+  const o = ed.opts;
+  document.querySelectorAll('[data-edstyle]').forEach(b => b.setAttribute('aria-pressed', b.dataset.edstyle === o.style));
+  $('#edLooks').innerHTML = chipsHtml(o.look);
+  $('#edScene').innerHTML = sceneOptions(o.scene);
+  const rows = [`<div class="row"><label for="ed-int">Intensité <output id="ed-int-o">${o.intensity} %</output></label><input type="range" id="ed-int" min="0" max="150" step="5" value="${o.intensity}"></div>`]
+    .concat(ADJ_UI.map(([k, n, mn, mx]) => `<div class="row"><label for="ed-${k}">${n} <output id="ed-${k}-o">${o.adj[k] || 0}</output></label><input type="range" data-adj="${k}" id="ed-${k}" min="${mn}" max="${mx}" step="5" value="${o.adj[k] || 0}"></div>`));
+  $('#edSliders').innerHTML = rows.join('');
+}
+function updateSceneLabel(){
+  if (!ed || ed.opts.scene !== 'auto' || !ed.scene) return;
+  const opt = $('#edScene').querySelector('option[value="auto"]');
+  if (opt) opt.textContent = `Auto (détecté : ${SCENE_FR[ed.scene]})`;
+}
+function schedEd(){ clearTimeout(edTimer); edTimer = setTimeout(runEdPreview, 80); }
+async function runEdPreview(){
+  if (!ed) return;
+  if (edBusy){ edDirty = true; return; }
+  edBusy = true;
+  try {
+    do {
+      edDirty = false;
+      const cur = ed; if (!cur) break;
+      const copy = cur.src.data.slice();
+      const r = await runEngine(copy.buffer, cur.src.w, cur.src.h, clone(cur.opts));
+      if (ed !== cur) break;
+      cur.res = new ImageData(new Uint8ClampedArray(r.buf), cur.src.w, cur.src.h); cur.scene = r.info.scene;
+      const cv = $('#edCv'); cv.width = cur.src.w; cv.height = cur.src.h;
+      cv.getContext('2d').putImageData(cur.res, 0, 0);
+      updateSceneLabel();
+    } while (edDirty);
+  } catch(e){ /* ignoré */ }
+  edBusy = false;
+}
+function edShow(orig){
+  if (!ed || !ed.res) return;
+  $('#edCv').getContext('2d').putImageData(orig ? ed.orig : ed.res, 0, 0);
+}
+
+/* ---------- Événements ---------- */
+const drop = $('#drop'), file = $('#file');
+drop.addEventListener('click', () => file.click());
+drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); file.click(); } });
+file.addEventListener('change', () => { addFiles(file.files); file.value = ''; });
+['dragover', 'dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
+
+document.querySelectorAll('.style[data-style]').forEach(b => b.addEventListener('click', () => {
+  G.style = b.dataset.style; persist(); syncGlobalUI();
+}));
+$('#looks').addEventListener('click', e => { const b = e.target.closest('[data-look]'); if (!b) return; G.look = b.dataset.look; persist(); syncGlobalUI(); schedulePreviews(); });
+$('#scene').addEventListener('change', e => { G.scene = e.target.value; persist(); schedulePreviews(); });
+$('#int').addEventListener('input', e => { G.intensity = +e.target.value; $('#intOut').textContent = G.intensity + ' %'; persist(); schedulePreviews(); });
+$('#bokeh').addEventListener('input', e => { G.adj.bokeh = +e.target.value; $('#bokehOut').textContent = G.adj.bokeh + ' %'; persist(); });
+['res', 'fmt', 'crop'].forEach(k => $('#' + k).addEventListener('change', e => { G[k] = e.target.value; persist(); }));
+
+$('#go').addEventListener('click', () => processAll());
+$('#cancel').addEventListener('click', () => { cancelled = true; cancelWork(); });
+$('#zip').addEventListener('click', zipAll);
+$('#share').addEventListener('click', shareAll);
+$('#clear').addEventListener('click', () => {
+  items.forEach(i => { URL.revokeObjectURL(i.origUrl); if (i.resUrl) URL.revokeObjectURL(i.resUrl); });
+  items = []; pvSrc = null; $('#prog').classList.remove('on'); render(); schedulePreviews();
+});
+$('#grid').addEventListener('click', e => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const id = +b.dataset.id, act = b.dataset.act;
+  if (act === 'cmp') openCmp(id);
+  if (act === 'edit') openEditor(id);
+  if (act === 'redo') processAll(id);
+  if (act === 'del' && !busy){
+    const it = items.find(i => i.id === id);
+    URL.revokeObjectURL(it.origUrl); if (it.resUrl) URL.revokeObjectURL(it.resUrl);
+    items = items.filter(i => i.id !== id); if (pvSrc && pvSrc.id === id) pvSrc = null;
+    render(); schedulePreviews();
+  }
+});
+$('#cmpRange').addEventListener('input', e => setCmp(+e.target.value));
+$('#cmpClose').addEventListener('click', () => $('#modal').classList.remove('on'));
+
+// éditeur
+document.querySelectorAll('[data-edstyle]').forEach(b => b.addEventListener('click', () => {
+  if (!ed) return; ed.opts.style = b.dataset.edstyle;
+  document.querySelectorAll('[data-edstyle]').forEach(x => x.setAttribute('aria-pressed', x === b)); schedEd();
+}));
+$('#edLooks').addEventListener('click', e => {
+  const b = e.target.closest('[data-look]'); if (!b || !ed) return;
+  ed.opts.look = b.dataset.look; $('#edLooks').innerHTML = chipsHtml(ed.opts.look); schedEd();
+});
+$('#edScene').addEventListener('change', e => { if (!ed) return; ed.opts.scene = e.target.value; schedEd(); });
+$('#edSliders').addEventListener('input', e => {
+  if (!ed) return; const t = e.target;
+  if (t.id === 'ed-int'){ ed.opts.intensity = +t.value; $('#ed-int-o').textContent = t.value + ' %'; }
+  else if (t.dataset.adj){ ed.opts.adj[t.dataset.adj] = +t.value; $('#ed-' + t.dataset.adj + '-o').textContent = t.value; }
+  schedEd();
+});
+$('#edReset').addEventListener('click', () => { if (!ed) return; ed.opts.adj = {}; ed.opts.intensity = 100; buildEditor(); schedEd(); });
+$('#edAll').addEventListener('click', () => {
+  if (!ed) return; const o = ed.opts;
+  Object.assign(G, { style:o.style, look:o.look, scene:o.scene, intensity:o.intensity, adj:Object.assign({ bokeh:0 }, o.adj) });
+  items.forEach(i => { i.opts = null; }); persist(); syncGlobalUI(); render();
+  toast('Réglages appliqués à toutes les photos.');
+});
+$('#edCancel').addEventListener('click', closeEditor);
+$('#edExport').addEventListener('click', () => {
+  if (!ed) return; const it = ed.it; it.opts = clone(ed.opts); closeEditor(); render(); processAll(it.id);
+});
+const hold = $('#edHold');
+hold.addEventListener('pointerdown', e => { e.preventDefault(); edShow(true); });
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => hold.addEventListener(ev, () => edShow(false)));
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ $('#modal').classList.remove('on'); if (ed) closeEditor(); } });
+
+syncGlobalUI(); render(); refreshPreviews();
+</script>
+</body>
+</html>
